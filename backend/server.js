@@ -4,7 +4,7 @@ const db = require("./db");
 const Product = require("./models/Product");
 
 const app = express();
-const port = 3030;
+const port = process.env.PORT || 3030;
 
 app.use(express.json());
 app.use(cors());

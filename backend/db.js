@@ -1,12 +1,17 @@
 const mongoose = require("mongoose");
 
-mongoose.connect("mongodb://localhost:27017/loja");
+const dbURI = "mongodb://mongodb:27017/seu-banco-de-dados";
 
-const db = mongoose.connection;
+mongoose
+    .connect(dbURI, { useNewUrlParser: true, useUnifiedTopology: true })
+    .then(() => console.log("Conexão com o MongoDB estabelecida"))
+    .catch((err) => console.error("Erro ao conectar ao MongoDB:", err));
 
-db.on("error", console.error.bind(console, "Error connecting to MongoDB:"));
-db.once("open", () => {
-    console.log("Successful connection to MongoDB!");
-});
+// const db = mongoose.connection;
 
-module.exports = db;
+// db.on("error", console.error.bind(console, "Error connecting to MongoDB:"));
+// db.once("open", () => {
+//     console.log("Successful connection to MongoDB!");
+// });
+
+// module.exports = db;
