@@ -1,5 +1,5 @@
 import React from "react";
-import { FaSearch, FaFilter } from "react-icons/fa";
+import { FaSearch } from "react-icons/fa";
 
 interface SearchBarProps {
     onSearch: (event: React.ChangeEvent<HTMLInputElement>) => void;
@@ -14,7 +14,7 @@ const SearchBar: React.FC<SearchBarProps> = ({ onSearch }) => {
                 placeholder="Search products..."
                 onChange={onSearch}
                 className="border border-gray-300 rounded-md px-10 py-2 pl-12"
-            />{" "}
+            />
         </div>
     );
 };

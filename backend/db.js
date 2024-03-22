@@ -4,9 +4,9 @@ mongoose.connect("mongodb://localhost:27017/loja");
 
 const db = mongoose.connection;
 
-db.on("error", console.error.bind(console, "Erro na conexão com o MongoDB:"));
+db.on("error", console.error.bind(console, "Error connecting to MongoDB:"));
 db.once("open", () => {
-    console.log("Conexão bem-sucedida com o MongoDB!");
+    console.log("Successful connection to MongoDB!");
 });
 
 module.exports = db;

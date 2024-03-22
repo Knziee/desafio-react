@@ -1,8 +1,9 @@
-import React, { useState, ChangeEvent, useEffect } from "react";
+import React, { useState, useEffect } from "react";
+import { toast } from "react-toastify";
 import Image from "next/image";
-import axiosInstance from "../../../services/axiosInstance"; // Importa a instância do Axios
+
+import axiosInstance from "../../../services/axiosInstance";
 import wipImage from "../../../public/images/testImage.jpg";
-import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
 interface ProductFormProps {
@@ -12,7 +13,7 @@ interface ProductFormProps {
     descriptionValue: string;
     dateValue: string;
     productId: string;
-    fetchProducts: (name: string) => Promise<void>;
+    fetchProducts: (searchValue: string) => Promise<void>;
 }
 
 const View: React.FC<ProductFormProps> = ({
@@ -43,12 +44,11 @@ const View: React.FC<ProductFormProps> = ({
         }
     }, [action, codeValue, priceValue, descriptionValue, dateValue]);
 
-    // console.log(code, description, price, imageData, contentType);
     const handleCreateProduct = async () => {
         try {
             if (!code || !description || !price || !date) {
-                console.error("Preencha todos os campos");
-                toast.error("Preencha todos os campos", {
+                console.error("Please complete all fields");
+                toast.error("Please complete all fields", {
                     position: "bottom-right",
                     autoClose: 5000,
                 });
@@ -74,15 +74,13 @@ const View: React.FC<ProductFormProps> = ({
                     productData
                 );
             }
-
-            console.log("Response:", response?.data);
             if (action === "create") {
-                toast.success("Produto criado com sucesso!", {
+                toast.success("Product created successfully!", {
                     position: "bottom-right",
                     autoClose: 5000,
                 });
             } else if (action === "edit") {
-                toast.success("Produto editado com sucesso!", {
+                toast.success("Product updated successfully!", {
                     position: "bottom-right",
                     autoClose: 5000,
                 });
@@ -94,28 +92,24 @@ const View: React.FC<ProductFormProps> = ({
             setPrice(0);
             setDate("");
         } catch (error: any) {
-            console.error("Erro ao criar/editar o produto:", error);
+            console.error("Error while creating/updating product:", error);
 
-            // Tratamento de erros e mensagens amigáveis
             if (error.response) {
-                // Erro de resposta da API
                 const errorMessage =
                     error.response.data.message ||
-                    "Erro ao processar a requisição.";
+                    "Error while processing request.";
                 toast.error(errorMessage, {
                     position: "bottom-right",
                     autoClose: 5000,
                 });
             } else if (error.message) {
-                // Erro de validação ou outro erro interno
                 toast.error(error.message, {
                     position: "bottom-right",
                     autoClose: 5000,
                 });
             } else {
-                // Erro desconhecido
                 toast.error(
-                    "Ocorreu um erro desconhecido. Por favor, tente novamente mais tarde.",
+                    "An unknown error occurred. Please try again later.",
                     {
                         position: "bottom-right",
                         autoClose: 5000,
@@ -127,7 +121,6 @@ const View: React.FC<ProductFormProps> = ({
 
     const handlePriceChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const value = e.target.value;
-        // Verifica se o valor é um número válido antes de converter
         if (!isNaN(parseFloat(value))) {
             setPrice(parseFloat(value));
         } else {

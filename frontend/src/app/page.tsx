@@ -1,84 +1,75 @@
 "use client";
-import Image from "next/image";
-import Header from "./components/Header";
-import "tailwindcss/tailwind.css";
-import React, { useState, ChangeEvent, useEffect } from "react";
-import { FaEye, FaEdit, FaTrash, FaSpinner } from "react-icons/fa";
-import SearchBar from "./components/SearchBar";
-import wipImage from "../../public/images/testImage.jpg";
-import View from "./components/View";
-import axiosInstance from "../../services/axiosInstance"; // Importa a instância do Axios
 import { ToastContainer, toast } from "react-toastify";
+import React, { useState, ChangeEvent, useEffect } from "react";
+import Image from "next/image";
+import { FaEye, FaEdit, FaTrash, FaSpinner } from "react-icons/fa";
+
+import Header from "./components/Header";
+import SearchBar from "./components/SearchBar";
+import View from "./components/View";
 import ConfirmationModal from "./components/ConfirmationModal";
+import axiosInstance from "../../services/axiosInstance";
+
+import "tailwindcss/tailwind.css";
+import wipImage from "../../public/images/testImage.jpg";
 
 export default function Home() {
     const [searchTerm, setSearchTerm] = useState<string>("");
-    const [products, setProducts] = useState<any[]>([]); // Estado para armazenar os produtos
+    const [products, setProducts] = useState<any[]>([]);
     const [action, setAction] = useState<string>("none");
-    const [selectedProduct, setSelectedProduct] = useState<any | null>(null); // Estado para armazenar o produto selecionado
+    const [selectedProduct, setSelectedProduct] = useState<any | null>(null);
+    const [isLoading, setIsLoading] = useState(true);
     const [showDeleteModal, setShowDeleteModal] = useState(false);
     const [productIdToDelete, setProductIdToDelete] = useState<string | null>(
         null
     );
-    const [isLoading, setIsLoading] = useState(true);
 
-    console.log(selectedProduct);
-
-    // Função para buscar produtos com base no nome
-    const fetchProductsByName = async (name: string) => {
+    const fetchProductsByName = async (searchValue: string) => {
         try {
-            // Define isLoading para true ao iniciar a solicitação
             const response = await axiosInstance.get("/products", {
-                params: { nome: name }, // Envia o parâmetro 'nome' na consulta
+                params: { descriptionParam: searchValue },
             });
             setProducts(response.data);
         } catch (error) {
-            console.error("Erro ao buscar produtos:", error);
-            toast.error(
-                "Erro ao buscar produtos. Por favor, tente novamente mais tarde.",
-                {
-                    position: "bottom-right",
-                    autoClose: 5000,
-                }
-            );
+            console.error("Error fetching products:", error);
+            toast.error("Error fetching products. Please try again later.", {
+                position: "bottom-right",
+                autoClose: 5000,
+            });
         } finally {
-            setIsLoading(false); // Define isLoading para false após a solicitação
+            setIsLoading(false);
         }
     };
     useEffect(() => {
         fetchProductsByName(searchTerm);
-    }, [searchTerm]); // Chama fetchProductsByName sempre que o searchTerm mudar
+    }, [searchTerm]);
 
     const handleSearch = (event: ChangeEvent<HTMLInputElement>) => {
-        // Atualiza o estado do searchTerm ao digitar no campo de busca
         setSearchTerm(event.target.value);
     };
 
     const handleProduct = (product: any) => {
-        setSelectedProduct(product); // Atualiza o produto selecionado
+        setSelectedProduct(product);
     };
 
     const handleConfirmDelete = async () => {
         try {
-            if (!productIdToDelete) return; // Verifica se há um ID de produto para excluir
+            if (!productIdToDelete) return;
             const response = await axiosInstance.delete(
                 `/products/delete/${productIdToDelete}`
             );
-            toast.success("Produto excluído com sucesso!", {
+            toast.success("Product deleted successfully!", {
                 position: "bottom-right",
                 autoClose: 5000,
             });
             fetchProductsByName(searchTerm);
             setShowDeleteModal(false);
         } catch (error) {
-            console.error("Erro ao excluir o produto:", error);
-            toast.error(
-                "Erro ao excluir o produto. Por favor, tente novamente mais tarde.",
-                {
-                    position: "bottom-right",
-                    autoClose: 5000,
-                }
-            );
+            console.error("Error deleting product:", error);
+            toast.error("Error deleting product. Please try again later.", {
+                position: "bottom-right",
+                autoClose: 5000,
+            });
             setShowDeleteModal(false);
         }
     };
@@ -86,11 +77,9 @@ export default function Home() {
         setProductIdToDelete(productId);
         setShowDeleteModal(true);
     };
-    console.log(action);
-    console.log(isLoading);
+
     return (
         <div className="bg-[#f3f5f8] min-h-screen">
-            {" "}
             <Header onCreateNewProduct={() => setAction("create")} />
             <div className="p-12 gap-5 flex justify-center ">
                 <div className="p-6 rounded-md shadow-md bg-white w-[60%] min-h-70vh">
@@ -125,7 +114,7 @@ export default function Home() {
                                         >
                                             <div className="flex justify-center items-center h-full">
                                                 <FaSpinner className="animate-spin text-blue-500" />
-                                            </div>{" "}
+                                            </div>
                                         </td>
                                     </tr>
                                 ) : products.length === 0 ? (
@@ -174,7 +163,7 @@ export default function Home() {
                                                         setAction("view");
                                                     }}
                                                 >
-                                                    <FaEye className="mr-1" />{" "}
+                                                    <FaEye className="mr-1" />
                                                     View
                                                 </button>
                                                 <button
@@ -184,7 +173,7 @@ export default function Home() {
                                                         handleProduct(product);
                                                     }}
                                                 >
-                                                    <FaEdit className="mr-1" />{" "}
+                                                    <FaEdit className="mr-1" />
                                                     Edit
                                                 </button>
                                                 <button
@@ -195,7 +184,7 @@ export default function Home() {
                                                         )
                                                     }
                                                 >
-                                                    <FaTrash className="mr-1" />{" "}
+                                                    <FaTrash className="mr-1" />
                                                     Delete
                                                 </button>
                                             </td>
@@ -205,11 +194,10 @@ export default function Home() {
                             </tbody>
                         </table>
                     </div>
-                </div>{" "}
+                </div>
                 {action === "none" ? (
                     <div className="p-6 rounded-md shadow-md bg-white w-[40%] flex justify-center items-center">
                         <div className="text-[26px] font-semibold">
-                            {" "}
                             Select a product or Create a new one
                         </div>
                     </div>
@@ -224,12 +212,12 @@ export default function Home() {
                         fetchProducts={fetchProductsByName}
                     />
                 )}
-            </div>{" "}
+            </div>
             <ConfirmationModal
                 isOpen={showDeleteModal}
                 onClose={() => setShowDeleteModal(false)}
                 onConfirm={handleConfirmDelete}
-                message="Tem certeza que deseja excluir este produto?"
+                message="Are you sure you want to delete it?"
             />
             <ToastContainer />
         </div>

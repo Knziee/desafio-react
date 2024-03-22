@@ -2,13 +2,12 @@ import React from "react";
 import Image from "next/image";
 
 interface HeaderProps {
-    onCreateNewProduct: () => void; // Tipo da propriedade onCreateNewProduct
+    onCreateNewProduct: () => void;
 }
 
 const Header: React.FC<HeaderProps> = ({ onCreateNewProduct }) => {
     return (
         <div className="bg-[#ffff] text-black h-[136px] px-4 sm:px-6 lg:px-8 flex items-center justify-between">
-            {/* Logo, Título e Subtítulo */}
             <div className="flex items-center">
                 <Image
                     src="https://serverinfo.com.br/templates/img/logo-server-software.svg"
@@ -25,10 +24,9 @@ const Header: React.FC<HeaderProps> = ({ onCreateNewProduct }) => {
                 </div>
             </div>
 
-            {/* Botão */}
             <div>
                 <div
-                    className="bg-blue-500 hover:bg-blue-600 text-white font-semibold py-3 px-8 rounded-lg mr-4"
+                    className="bg-blue-500 hover:bg-blue-600 text-white font-semibold py-3 px-8 rounded-lg mr-4 cursor-pointer"
                     onClick={onCreateNewProduct}
                 >
                     Create New Product
