@@ -1,7 +1,11 @@
 import React from "react";
 import Image from "next/image";
 
-export default function Header() {
+interface HeaderProps {
+    onCreateNewProduct: () => void; // Tipo da propriedade onCreateNewProduct
+}
+
+const Header: React.FC<HeaderProps> = ({ onCreateNewProduct }) => {
     return (
         <div className="bg-[#ffff] text-black h-[136px] px-4 sm:px-6 lg:px-8 flex items-center justify-between">
             {/* Logo, Título e Subtítulo */}
@@ -23,10 +27,15 @@ export default function Header() {
 
             {/* Botão */}
             <div>
-                <div className="bg-blue-500 hover:bg-blue-600 text-white font-semibold py-3 px-8 rounded-lg mr-4">
+                <div
+                    className="bg-blue-500 hover:bg-blue-600 text-white font-semibold py-3 px-8 rounded-lg mr-4"
+                    onClick={onCreateNewProduct}
+                >
                     Create New Product
                 </div>
             </div>
         </div>
     );
-}
+};
+
+export default Header;

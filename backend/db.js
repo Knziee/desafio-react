@@ -1,8 +1,6 @@
-// db.js
 const mongoose = require("mongoose");
 
-// Para:
-mongoose.connect('mongodb://localhost:27017/loja');
+mongoose.connect("mongodb://localhost:27017/loja");
 
 const db = mongoose.connection;
 

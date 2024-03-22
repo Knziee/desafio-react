@@ -2,26 +2,22 @@
 const mongoose = require("mongoose");
 
 const productSchema = new mongoose.Schema({
-    codigo: {
+    code: {
         type: String,
         required: true,
         unique: true,
     },
-    descricao: {
+    description: {
         type: String,
         required: true,
     },
-    imagem: {
-        data: Buffer,
-        contentType: String,
-    },
-    preco: {
+    price: {
         type: Number,
         required: true,
     },
-    data_cadastro: {
-        type: Date,
-        default: Date.now,
+    date: {
+        type: String,
+        required: true,
     },
 });
 

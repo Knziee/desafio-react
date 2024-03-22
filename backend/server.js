@@ -1,5 +1,6 @@
 // server.js
 const express = require("express");
+const cors = require("cors");
 const db = require("./db");
 const fs = require("fs").promises; // Importando fs com métodos assíncronos
 const mime = require("mime-types");
@@ -10,6 +11,8 @@ const port = 3030;
 
 app.use(express.json());
 
+app.use(cors());
+
 // Rota para listar todos os produtos com imagem (ArrayBuffer)
 app.get("/api/products", async (req, res) => {
     try {
@@ -19,98 +22,61 @@ app.get("/api/products", async (req, res) => {
 
         // Se o parâmetro 'nome' estiver presente, adiciona a busca por nome na consulta
         if (nome) {
-            query.descricao = { $regex: new RegExp(nome, "i") }; // Busca por nome (case insensitive)
+            query.description = { $regex: new RegExp(nome, "i") }; // Busca por nome (case insensitive)
         }
 
         // Busca todos os produtos no banco de dados com base na consulta
         const products = await Product.find(query);
 
-        // Mapeia os produtos para incluir a imagem como ArrayBuffer se ela existir
-        const productsWithImage = products.map((product) => {
-            const productData = product.toJSON();
-            // Verifica se o produto possui imagem
-            if (product.imagem && product.imagem.data) {
-                // Converte o Buffer da imagem em ArrayBuffer para enviar na resposta
-                productData.imageData = Uint8Array.from(
-                    product.imagem.data
-                ).buffer;
-            }
-            return productData;
+        // Retorna apenas os dados básicos do produto
+        const productsData = products.map((product) => {
+            return product.toJSON();
         });
 
-        res.json(productsWithImage);
+        res.json(productsData);
     } catch (error) {
         console.error(error);
         res.status(500).json({ message: "Erro ao buscar produtos" });
     }
 });
 
-// Rota para criar um novo produto com imagem (ArrayBuffer)
 app.post("/api/products/create", async (req, res) => {
-    const { codigo, descricao, preco } = req.body;
-    const imageData = req.body.imageData; // Array de bytes da imagem (ArrayBuffer)
-
-    // Verifica se os dados da imagem estão presentes no corpo da requisição
-    if (!imageData || !imageData.byteLength) {
-        return res
-            .status(400)
-            .json({ message: "Dados da imagem não fornecidos" });
-    }
+    const { code, description, price, date } = req.body;
 
     try {
-        // Criando o objeto do produto com a imagem como Buffer
+        console.log("Dados recebidos no corpo da requisição:", req.body);
+
+        // Criando o objeto do produto
         const newProduct = new Product({
-            codigo: codigo,
-            descricao: descricao,
-            imagem: {
-                data: Buffer.from(imageData), // Converte o ArrayBuffer em um Buffer
-                contentType: req.body.contentType, // Tipo de conteúdo da imagem (ex: image/jpeg)
-            },
-            preco: preco,
+            code: code,
+            description: description,
+            price: price,
+            date: date,
         });
 
         // Salvando o produto no banco de dados
         const savedProduct = await newProduct.save();
         res.status(201).json(savedProduct);
     } catch (error) {
-        console.error("Erro ao salvar o produto com imagem:", error);
-        res.status(500).json({ message: "Erro ao criar produto com imagem" });
+        console.error("Erro ao salvar o produto:", error);
+        res.status(500).json({ message: "Erro ao criar produto" });
     }
 });
 
-// Rota para atualizar um produto existente com imagem (ArrayBuffer)
+// Rota para atualizar um produto existente
 app.put("/api/products/update/:id", async (req, res) => {
     const { id } = req.params;
-    const { codigo, descricao, preco } = req.body;
-    const imageData = req.body.imageData; // Array de bytes da nova imagem (ArrayBuffer)
-
-    // Verifica se os dados da imagem estão presentes no corpo da requisição
-    let updatedImage;
-    if (imageData && imageData.byteLength) {
-        try {
-            // Cria o objeto da nova imagem como Buffer
-            updatedImage = {
-                data: Buffer.from(imageData), // Converte o ArrayBuffer em um Buffer
-                contentType: req.body.contentType, // Tipo de conteúdo da nova imagem (ex: image/jpeg)
-            };
-        } catch (error) {
-            console.error("Erro ao criar a nova imagem:", error);
-            return res
-                .status(500)
-                .json({ message: "Erro ao atualizar produto com imagem" });
-        }
-    }
+    const { code, description, price, date } = req.body;
 
     try {
         // Encontra e atualiza o produto no banco de dados
         const updatedProduct = await Product.findByIdAndUpdate(
             id,
             {
-                codigo: codigo,
-                descricao: descricao,
-                preco: preco,
-                // Se houver uma nova imagem, atualiza a imagem também
-                ...(updatedImage && { imagem: updatedImage }),
+                code: code,
+                description: description,
+                price: price,
+                date: date,
             },
             { new: true }
         );
