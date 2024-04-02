@@ -1,6 +1,6 @@
 const mongoose = require("mongoose");
 
-const dbURI = "mongodb://mongodb:27017/seu-banco-de-dados";
+const dbURI = "mongodb://mongodb:27017/loja";
 
 mongoose
     .connect(dbURI, { useNewUrlParser: true, useUnifiedTopology: true })
